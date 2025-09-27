@@ -1,0 +1,86 @@
+# Methane Emissions Mapping and Risk Analysis Configuration
+project:
+  name: "Grand Teton Methane Emissions Analysis"
+  version: "1.0.0"
+  description: "Spatial analysis workflow for methane emissions risk assessment"
+  
+# Study area configuration
+study_area:
+  name: "Grand Teton National Park"
+  bounds:
+    # Bounding box for Grand Teton area [minx, miny, maxx, maxy]
+    bbox: [-111.05, 43.65, -110.10, 43.85]
+  epsg: 32612  # UTM Zone 12N for Wyoming
+  buffer_km: 10  # Buffer around park boundary for analysis
+
+# Data sources configuration
+data_sources:
+  lidar:
+    source: "USGS 3DEP"
+    resolution: 1  # meters
+    data_type: "point_cloud"
+    
+  oil_gas_infrastructure:
+    wells:
+      source: "Wyoming Oil and Gas Conservation Commission"
+      api: "https://wogcc.wyo.gov/api/"
+    pipelines:
+      source: "NPMS (National Pipeline Mapping System)"
+      buffer_m: 500  # Analysis buffer around pipelines
+    
+  satellite_methane:
+    source: "TROPOMI/Sentinel-5P"
+    temporal_range: "2019-2024"
+    resolution: "5.5x7km"
+    
+  environmental:
+    elevation:
+      source: "USGS 3DEP DEM"
+      resolution: 10  # meters
+    landcover:
+      source: "NLCD"
+      year: 2021
+    meteorology:
+      source: "GRIDMET"
+      variables: ["wind_speed", "wind_direction", "temperature"]
+
+# Analysis parameters
+analysis:
+  risk_factors:
+    weights:
+      infrastructure_proximity: 0.35
+      methane_concentration: 0.30
+      terrain_factors: 0.15
+      meteorological: 0.10
+      landcover_sensitivity: 0.10
+      
+  proximity_analysis:
+    well_buffer_m: [100, 500, 1000, 2000]
+    pipeline_buffer_m: [50, 200, 500, 1000]
+    
+  risk_classification:
+    thresholds:
+      very_low: 0.2
+      low: 0.4
+      moderate: 0.6
+      high: 0.8
+      very_high: 1.0
+
+# Output configuration
+outputs:
+  formats: ["geotiff", "shapefile", "geojson", "netcdf"]
+  visualizations: ["interactive_map", "risk_heatmap", "statistical_plots"]
+  reports: ["summary_report", "technical_analysis", "risk_assessment"]
+  
+# Processing configuration
+processing:
+  chunk_size: 1000  # For large datasets
+  parallel_workers: 4
+  memory_limit_gb: 8
+  temp_dir: "./temp"
+  
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "./logs/methane_analysis.log"
