@@ -1,0 +1,17 @@
+# Run unit tests
+pytest
+
+# Run with coverage
+pytest --cov=src --cov-report=html --cov-report=term
+
+# Run linting
+flake8 src/ --max-line-length=100
+
+# Code formatting
+black src/ --line-length=100
+
+# Type checking (if using mypy)
+mypy src/
+
+# Generate documentation
+sphinx-build -b html docs/ docs/_build/
